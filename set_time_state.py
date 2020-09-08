@@ -2,65 +2,68 @@ import datetime
 from base_state import BaseState
 
 class SetTimeState(BaseState):
-    def __init__(self, state_name, state_icon, home_state):
+    def __init__(self, state_name, state_icon, homeSState):
+        self.HH = False
+        self.MM = False
+        self.SS = False
         self.set_edit_mode("H")
-        self._H = False
-        self._M = False
-        self._S = False
-        super().__init__(state_name, state_icon, home_state)
+        super().__init__(state_name, state_icon, homeSState)
 
     def set_edit_mode(self, mode):
         now = datetime.datetime.now()
         self._mode = mode
         if self._mode == "H":
-            if not self._H:
-                self._H = now.strftime("%H")
+            if not self.HH:
+                self.HH = now.strftime("%H")
         elif self._mode == "M":
-            if not self._M:
-                self._M = now.strftime("%M")
+            if not self.MM:
+                self.MM = now.strftime("%M")
         else:
-            if not self._S:
-                self._S = now.strftime("%S")
+            if not self.SS:
+                self.SS = now.strftime("%S")
 
     def up(self):
         if self._mode == "H":
-            h = int(self._H)
+            h = int(self.HH)
             h = h+1
             if h > 23:
                 h = 0
-            self._H = str(h).zfill(2)
+            self.HH = str(h).zfill(2)
         elif self._mode == "M":
-            m = int(self._M)
+            m = int(self.MM)
             m = m+1
             if m < 59:
                 m = 0
-            self._M = str(m).zfill(2)
+            self.MM = str(m).zfill(2)
         else:
-            s = int(self._S)
+            s = int(self.SS)
             s = s+1
             if s > 59:
                 s = 0
-            self._S = str(s).zfill(2)
+            self.SS = str(s).zfill(2)
             
     def down(self):
         if self._mode == "H":
-            h = int(self._H)
+            h = int(self.HH)
             h = h-1
             if h < 0:
                 h = 23
-            self._H = str(h).zfill(2)
+            self.HH = str(h).zfill(2)
         elif self._mode == "M":
-            m = int(self._M)
+            m = int(self.MM)
             m = m-1
             if m < 0:
                 m = 59
-            self._M = str(m).zfill(2)
+            self.MM = str(m).zfill(2)
         else:
-            s = int(self._S)
+            s = int(self.SS)
             s = s-1
             if s < 0:
                 s = 59
-            self._S = str(s).zfill(2)
+            self.SS = str(s).zfill(2)
+
+    def set_system_time(self):
+        print ("time" +self.HH+":"+self.MM+":"+self.SS)
 
     def left(self):
         if self._mode == "H":
@@ -78,18 +81,18 @@ class SetTimeState(BaseState):
 
     def show_state(self, draw, width, height):
         now = datetime.datetime.now()
-        if self._H:
-            time_now = self._H
+        if self.HH:
+            time_now = self.HH
         else:
             time_now = now.strftime("%H")
         time_now += ":"
-        if self._M:
-            time_now += self._M
+        if self.MM:
+            time_now += self.MM
         else:
             time_now += now.strftime("%M")
         time_now += ":"
-        if self._S:
-            time_now += self._S
+        if self.SS:
+            time_now += self.SS
         else:
             time_now += now.strftime("%S")
 
