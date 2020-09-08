@@ -2,12 +2,15 @@ import datetime
 from base_state import BaseState
 
 class SetTimeState(BaseState):
-    def __init__(self, state_name, state_icon, homeSState):
+    def __init__(self, state_name, state_icon, home_state):
+        super().__init__(state_name, state_icon, home_state)
+
+    def activate(self):
         self.HH = False
         self.MM = False
         self.SS = False
         self.set_edit_mode("H")
-        super().__init__(state_name, state_icon, homeSState)
+        super()
 
     def set_edit_mode(self, mode):
         now = datetime.datetime.now()
@@ -32,7 +35,7 @@ class SetTimeState(BaseState):
         elif self._mode == "M":
             m = int(self.MM)
             m = m+1
-            if m < 59:
+            if m > 59:
                 m = 0
             self.MM = str(m).zfill(2)
         else:
@@ -97,8 +100,8 @@ class SetTimeState(BaseState):
             time_now += now.strftime("%S")
 
         gap = 6
-        wu,hu = draw.textsize(text="\uf105", font=BaseState.font_awesome_small)
-        wd,hd = draw.textsize(text="\uf104", font=BaseState.font_awesome_small)
+        wu,hu = draw.textsize(text="\uf077", font=BaseState.font_awesome_small)
+        wd,hd = draw.textsize(text="\uf078", font=BaseState.font_awesome_small)
         wt,ht = draw.textsize(text=time_now)
 
         top = height - ht -gap - hu
@@ -116,8 +119,8 @@ class SetTimeState(BaseState):
         else:
             left += ((wdd - wu) / 2) + (wc + wdd) * 2
 
-        draw.text((left, top), text="\uf105", font=BaseState.font_awesome_small, fill="yellow")
+        draw.text((left, top), text="\uf077", font=BaseState.font_awesome_small, fill="yellow")
         top += hu + gap + ht + gap          
-        draw.text((left, top), text="\uf104", font=BaseState.font_awesome_small, fill="yellow")           
+        draw.text((left, top), text="\uf078", font=BaseState.font_awesome_small, fill="yellow")           
 
 
