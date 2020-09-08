@@ -1,0 +1,130 @@
+from luma.core.render import canvas
+
+class BaseState:
+    def __init__(self, state_name, state_icon, home_state):
+        self.update_required = True
+        self.state_name = state_name
+        self.state_icon = state_icon
+        self.next_state = None
+        self.prev_state = None
+        if home_state == None:
+            # Special case None => we are the home state
+            self.home_state = self
+            self.change_state(self)
+        else:
+            BaseState.home_state = home_state
+        self.action_state = None
+        self.parent_state = None
+
+    def set_next_state(self, next_state):
+        self.next_state = next_state
+        if self.next_state != None:
+            self.next_state.prev_state = self
+
+    def set_action_state(self, action_state):
+        self.action_state = action_state
+        if self.action_state != None:
+            self.action_state.parent_state = self
+
+    def activate(self):
+        self.update_required = True
+
+    def should_update(self):
+        return self.update_required
+
+    def change_state(self, new_state):
+        BaseState.current_state = new_state
+        new_state.activate()
+
+    def next(self):
+        return self.next_state
+
+    def prev(self):
+        return self.prev_state
+
+    def name(self):
+        return self.state_name
+
+    def icon(self):
+        return self.state_icon
+
+    def next_icon(self):
+        if self.next_state != None:
+            return self.next_state.icon()
+        else:
+            return " "
+
+    def prev_icon(self):
+        if self.prev_state != None:
+            return self.prev_state.icon()
+        else:
+            return " "
+
+    def up(self):
+        if self.prev() != None:
+            self.change_state(self.prev())
+        else:
+            self.handleAnyInput()
+
+    def down(self):
+        if self.next() != None:
+            self.change_state(self.next())
+        else:
+            self.handleAnyInput()
+
+    def left(self):
+        if self.parent_state != None:
+            self.change_state(self.parent_state)
+        else:
+            self.handleAnyInput()
+
+    def right(self):
+        self.action()
+
+    def action(self):
+        if self.action_state != None:
+            self.change_state(self.action_state)
+        else:
+            self.handleAnyInput()
+
+    def home(self):
+        self.change_state(BaseState.home_state)
+
+    def handleAnyInput(self):
+        return
+
+    def show_state(self, draw, width, height):
+        self.update_required = False
+        gap = 3
+        icon = self.icon()
+        state = self.name()
+        prev_icon = self.prev_icon()
+        next_icon = self.next_icon()
+        wp, hp = draw.textsize(text=prev_icon, font=BaseState.font_awesome_small)
+        wi, hi = draw.textsize(text=icon, font=BaseState.font_awesome)
+        wa, ha = draw.textsize(text="\uf105", font=BaseState.font_awesome)
+        ws, hs = draw.textsize(text=state)
+        wn, hn = draw.textsize(text=next_icon, font=BaseState.font_awesome_small)
+        left = (width - wp) / 2
+        top = 0
+        draw.text((left, top), text=prev_icon, font=BaseState.font_awesome_small, fill="yellow")
+        left = (width - wi) / 2
+        top += hp + gap
+        draw.text((left, top), text=icon, font=BaseState.font_awesome, fill="yellow")
+        if self.action_state != None:
+            draw.text((width - wa, top), text="\uf105", font=BaseState.font_awesome, fill="yellow")
+        if self.parent_state != None:
+            draw.text((0, top), text="\uf104", font=BaseState.font_awesome, fill="yellow")
+        left = (width - ws) / 2
+        top += gap + hi
+        draw.text((left, top), text=state, fill="yellow")
+        left = (width - wn) / 2
+        top += gap + hs
+        draw.text((left, top), text=next_icon, font=BaseState.font_awesome_small, fill="yellow")
+
+    def show(self, display):
+        with canvas(display) as draw:
+            self.show_state(draw, display.width, display.height)
+
+    def is_running(self):
+        return True
