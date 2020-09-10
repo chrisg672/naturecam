@@ -43,7 +43,7 @@ def make_font(name, size):
 BaseState.font_awesome = make_font("fa-solid-900.ttf", large_icon_size)
 BaseState.font_awesome_small = make_font("fa-solid-900.ttf", small_icon_size)
 font_awesome_brands = make_font("fa-brands-400.ttf", large_icon_size)
-font_awesome_brands_small = make_font("fa-brands-400.ttf", small_icon
+font_awesome_brands_small = make_font("fa-brands-400.ttf", small_icon_size)
 
 home_state = BaseState("home", "\uf015", None, BaseState.font_awesome, BaseState.font_awesome_small)
 settings_state = BaseState("settings", "\uf013", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
@@ -51,10 +51,10 @@ set_capture_mode_state = BaseState("capture mode", "\uf030", home_state, BaseSta
 settings_time = BaseState("set time", "\uf017", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 settings_date = BaseState("set date", "\uf073", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 arm_state = BaseState("arm", "\uf21b", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
-time_state = TimeState("time", "\uf017", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
-set_time_state = SetTimeState("set time", " ", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
-set_date_state = SetDateState("set date", " ", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
-usb_state = BaseState("usb", "\uf287", home_state, BaseState.font_awesome_brands, BaseState.font_awesome_brands_small)
+time_state = TimeState(home_state)
+set_time_state = SetTimeState(home_state)
+set_date_state = SetDateState(home_state)
+usb_state = BaseState("usb", "\uf287", home_state, font_awesome_brands, font_awesome_brands_small)
 wifi_state = BaseState("wifi", "\uf1eb", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 
 home_state.set_next_state(settings_state)
@@ -66,8 +66,6 @@ settings_time.set_action_state(set_time_state)
 settings_date.set_next_state(usb_state)
 settings_date.set_action_state(set_date_state)
 usb_state.set_next_state(wifi_state)
-
-
 
 
 def up_pressed():

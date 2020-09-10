@@ -4,10 +4,10 @@ from base_state import BaseState
 from luma.core.render import canvas
 
 class TimeState(BaseState):
-    def __init__(self, state_name, state_icon, home_state):
+    def __init__(self, home_state):
         self.date_now = ""
         self.time_now = ""
-        super().__init__(state_name, state_icon, home_state)
+        super().__init__("time", " ", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 
     def handleAnyInput(self):
         self.home()

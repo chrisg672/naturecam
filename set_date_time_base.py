@@ -2,12 +2,14 @@ import datetime
 from base_state import BaseState
 
 class SetDateTimeBaseState(BaseState):
-    def __init__(self, state_name, state_icon, home_state):
-        super().__init__(state_name, state_icon, home_state)
+    def __init__(self, state_name, home_state):
+        self.min = [0,0,0]
+        self.max = [23,59,59]
+        super().__init__(state_name, " ", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 
     def activate(self):
         now = datetime.datetime.now()
-        self._mode = mode
+        self._mode = 0
         self.time = [now.strftime("%H"), now.strftime("%M"), now.strftime("%S")]
         self.set_edit_mode(0)
         super()

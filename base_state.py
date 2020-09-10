@@ -69,7 +69,7 @@ class BaseState:
             return " "
 
     def prev_font(self):
-        if self.prwv_state != None:
+        if self.prev_state != None:
             return self.prev_state.font_small
         else:
             return BaseState.font_awesome_small
@@ -136,7 +136,7 @@ class BaseState:
         draw.text((left, top), text=state, fill="yellow")
         left = (width - wn) / 2
         top += gap + hs
-        draw.text((left, top), text=next_icon, font=next_font fill="yellow")
+        draw.text((left, top), text=next_icon, font=next_font, fill="yellow")
 
     def show(self, display):
         with canvas(display) as draw:
