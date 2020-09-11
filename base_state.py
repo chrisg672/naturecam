@@ -1,4 +1,5 @@
 from luma.core.render import canvas
+from datetime import datetime
 import logging
 
 logdir = '/home/pi/trailcam_log'
@@ -24,7 +25,7 @@ class BaseState:
             BaseState.home_state = home_state
         self.action_state = None
         self.parent_state = None
-        self.motion_was_detected = False
+        BaseState.motion_was_detected = False
 
 
     def set_next_state(self, next_state):
@@ -117,10 +118,10 @@ class BaseState:
         return
 
     def motion_detected(self):
-        self.motion_was_detected = True
+        BaseState.motion_was_detected = True
 
     def motion_stopped(self):
-        self.motion_was_detected = False
+        BaseState.motion_was_detected = False
 
     def log_info(self, message):
         logging.info(message)
@@ -129,11 +130,11 @@ class BaseState:
         w, h = draw.textsize(text=text)
         left = (width - w) / 2
         top = (height -h) / 2
-        draw.text((left, top), text=text, fill="yelloe")
+        draw.text((left, top), text=text, fill="yellow")
 
     def show_motion_dot(self, draw, width, height):
-        if motion_was_detected:
-            draw.ellipse((width,0,width-8,8), fill="yellow")
+        if BaseState.motion_was_detected:
+            draw.ellipse((width-4,0,width,4), fill="yellow")
 
     def show_state(self, draw, width, height):
         self.update_required = False
@@ -165,7 +166,7 @@ class BaseState:
         left = (width - wn) / 2
         top += gap + hs
         draw.text((left, top), text=next_icon, font=next_font, fill="yellow")
-        self.show_motion_dot(draw, wicth, height)
+        self.show_motion_dot(draw, width, height)
 
     def show(self, display):
         with canvas(display) as draw:

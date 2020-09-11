@@ -7,6 +7,7 @@ from base_state import BaseState
 from time_state import TimeState
 from set_time_state import SetTimeState
 from set_date_state import SetDateState
+from capture_state import CaptureState
 import os
 from PIL import ImageFont
 
@@ -49,7 +50,7 @@ font_awesome_brands_small = make_font("fa-brands-400.ttf", small_icon_size)
 
 home_state = BaseState("home", "\uf015", None, BaseState.font_awesome, BaseState.font_awesome_small)
 settings_state = BaseState("settings", "\uf013", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
-set_capture_mode_state = BaseState("capture mode", "\uf030", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
+start_capture_state = BaseState("start capture", "\uf030", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 settings_time = BaseState("set time", "\uf017", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 settings_date = BaseState("set date", "\uf073", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 arm_state = BaseState("arm", "\uf21b", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
@@ -57,19 +58,21 @@ time_state = TimeState(home_state)
 set_time_state = SetTimeState(home_state)
 set_date_state = SetDateState(home_state)
 capture_state = CaptureState(home_state)
-usb_state = BaseState("usb", "\uf287", home_state, font_awesome_brands, font_awesome_brands_small)
-wifi_state = BaseState("wifi", "\uf1eb", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
+settings_usb = BaseState("usb", "\uf287", home_state, font_awesome_brands, font_awesome_brands_small)
+settings_wifi = BaseState("wifi", "\uf1eb", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 
-home_state.set_next_state(settings_state)
 home_state.set_action_state(time_state)
-settings_state.set_action_state(set_capture_mode_state)
-set_capture_mode_state.set_next_state(settings_time)
-set_capture_mode_state.set_action_state(capture_state)
-settings_time.set_next_state(settings_date)
 settings_time.set_action_state(set_time_state)
-settings_date.set_next_state(usb_state)
 settings_date.set_action_state(set_date_state)
-usb_state.set_next_state(wifi_state)
+start_capture_state.set_action_state(capture_state)
+
+home_state.set_next_state(start_capture_state)
+capture_state.set_next_state(settings_state)
+settings_state.set_action_state(settings_time)
+settings_time.set_next_state(settings_date)
+settings_date.set_next_state(settings_usb)
+settings_usb.set_next_state(settings_wifi)
+
 
 
 def up_pressed():
@@ -103,7 +106,7 @@ RIGHT_BUTTON.when_pressed = right_pressed
 ACTION_BUTTON.when_pressed = action_pressed
 HOME_BUTTON.when_pressed = home_pressed
 PIR.when_motion = motion_detected
-PIR when_no_motion = motion_stopped
+PIR.when_no_motion = motion_stopped
 BaseState.pir = PIR
 
 while BaseState.current_state.is_running():

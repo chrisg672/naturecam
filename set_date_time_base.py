@@ -1,4 +1,3 @@
-import datetime
 from base_state import BaseState
 
 class SetDateTimeBaseState(BaseState):

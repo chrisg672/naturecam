@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from set_date_time_base import SetDateTimeBaseState
 
 class SetTimeState(SetDateTimeBaseState):
@@ -13,7 +13,7 @@ class SetTimeState(SetDateTimeBaseState):
         self.sep = ":"
 
     def activate(self):
-        now = datetime.datetime.now()
+        now = datetime.now()
         self._mode = 0
         self.time = [now.strftime("%H"), now.strftime("%M"), now.strftime("%S")]
         self.set_edit_mode(0)

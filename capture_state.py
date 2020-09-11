@@ -12,64 +12,45 @@ def ensure_dirs():
     if not os.path.exists('/home/pi/videos'):
         os.makedirs('/home/pi/videos')
 
-    if not os.path.exists('/mnt/usb/videos'):
-        os.makedirs('/mnt/usb/videos')
-
-def capture_video():
-    ts = '{:%Y%m%d-%H%M%S}'.format(datetime.now())
-    self.log_info('Beginning capture: '+ str(ts)+'.h264')
-    with picamera.PiCamera() as cam:
-        cam.resolution=(1920, 1024)
-        cam.annotate_background = picamera.Color('black')
-
-        cam.start_recording('/home/pi/video.h264')
-        start = datetime.now()
-        while (datetime.now() - start).seconds < duration:
-            print (datetime.now() - start).seconds 
-            cam.annotate_text = datetime.now().strftime('%d-%m-%y %H:%M:%S')
-            cam.wait_recording(0.2)
-        cam.stop_recording()
-    time.sleep(1)
-    log_info('Stopped recording')
-    timestamp = datetime.now().strftime('%d-%m-%y_%H-%M-%S')
-    input_video = '/home/pi/video.h264'
-
-    log_info('Attempting to save video')
-
     usb = call('mountpoint -q /mnt/usb', shell=True)
 
-    if usb == 0:
-        self.log_info('Saving to /mnt/usb/videos/')
-        output_video = '/mnt/usb/videos/{}.mp4'.format(timestamp)
-    else:
-        self.log_info('Saving to /home/pi/videos/')
-        output_video = '/home/pi/videos/{}.mp4'.format(timestamp)
+    if usb == 0 and not os.path.exists('/mnt/usb/videos'):
+        os.makedirs('/mnt/usb/videos')
 
-    call(['MP4Box', '-add', input_video, output_video])
-
+# TODO - add a "saving file" sub-state
+# TODO - turn on IR-CUT filter and switch on LED ARRAY
+# TODO - make settle time and capture duration configurable
+# TODO - add video still capture mode
+# TODO - add timelapse capture mode
 class CaptureState(BaseState):
-    def __init__(self, state_name, state_icon, home_state, font, font_small):
+    def __init__(self, home_state):
         self.capturing_video = False
         self.settling = False
         ensure_dirs()
         super().__init__("capture", " ", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
     
     def activate(self):
-        self.start_settling(60)
+        self.start_settling(10) # should be 60
         super().activate()
+
+    # def down(self):
+    #     self.motion_stopped()
+
+    # def up(self):
+    #     self.motion_detected()
 
     def motion_detected(self):
         if not self.capturing_video and not self.settling:
             self.start_capture_video()
         super().motion_detected()
 
-    def start_capture_video():
-        self.capturing_video = True
+    def start_capture_video(self):
         self.cam = picamera.PiCamera()
         self.cam.resolution = (1920,1024)
         self.cam.annotate_background = picamera.Color('black')
         self.cam.start_recording('/home/pi/video.h264')
         self.capture_end_at = time.mktime(datetime.now().utctimetuple()) + 20
+        self.capturing_video = True
 
     def update_video(self):
         if self.capturing_video:
@@ -156,9 +137,9 @@ class CaptureState(BaseState):
         now = time.mktime(datetime.now().utctimetuple())
         if self.capturing_video:
             elapsed = now + 20 - self.capture_end_at
-            message = "recording " + elapsed + " / 20"
+            message = "recording " + str(int(elapsed)).zfill(2) + "/20"
         if self.settling:
             elapsed = now + self.settle_duration - self.settle_after
-            message = "settling " + elapsed + " / " + self.settle_duration
-        self.centre_text(darw, width, height, message)
-        self.show_motion_dot)(draw, width, height)
+            message = "settling " + str(int(elapsed)).zfill(2) + "/" + str(int(self.settle_duration))
+        self.centre_text(draw, width, height, message)
+        self.show_motion_dot(draw, width, height)

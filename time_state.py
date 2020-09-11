@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import psutil
 from base_state import BaseState
 from luma.core.render import canvas
@@ -13,7 +13,7 @@ class TimeState(BaseState):
         self.home()
 
     def should_update(self):
-        now = datetime.datetime.now()
+        now = datetime.now()
         date_now = now.strftime("%d %b %y")
         time_now = now.strftime("%H:%M:%S")
         if (time_now != self.time_now or date_now != self.date_now):
