@@ -12,5 +12,12 @@ class SetTimeState(SetDateTimeBaseState):
         self.max[2] = 59
         self.sep = ":"
 
+    def activate(self):
+        now = datetime.datetime.now()
+        self._mode = 0
+        self.time = [now.strftime("%H"), now.strftime("%M"), now.strftime("%S")]
+        self.set_edit_mode(0)
+        super()
+
     def set_date_time(self):
         print ("sudo date %T -s " +self.time[0]+self.sep+self.time[1]+self.sep+self.time[2])

@@ -7,13 +7,6 @@ class SetDateTimeBaseState(BaseState):
         self.max = [23,59,59]
         super().__init__(state_name, " ", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 
-    def activate(self):
-        now = datetime.datetime.now()
-        self._mode = 0
-        self.time = [now.strftime("%H"), now.strftime("%M"), now.strftime("%S")]
-        self.set_edit_mode(0)
-        super()
-
     def set_edit_mode(self, mode):
         self._mode = mode
 
@@ -35,9 +28,12 @@ class SetDateTimeBaseState(BaseState):
     def set_date_time(self):
         print ("sudo date %T -s " +self.time[0]+self.sep+self.time[1]+self.sep+self.time[2])
 
+    def action(self):
+        self.set_date_time()
+        
     def left(self):
         if self._mode == 0:
-           super()  
+           super().left()  
         else:
            self.set_edit_mode(self._mode - 1)  
 
@@ -53,17 +49,15 @@ class SetDateTimeBaseState(BaseState):
         wd,hd = draw.textsize(text="\uf078", font=BaseState.font_awesome_small)
         wt,ht = draw.textsize(text=now)
 
-        top = height - ht -gap - hu
+        top = height - ht - gap - hu
         left = (width - wt) / 2
         draw.text((left, top), text=now, fill = "yellow")
 
         ws,hs = draw.textsize(text=self.sep)
         wdd,hdd = draw.textsize(text="00")
-        top = height -hd - gap - ht -gap - hu
+        top = height - hd - gap - ht - gap - hu
         left = (width - wt) / 2 + (wdd - wu) / 2 + (ws + wdd) * self._mode           
 
         draw.text((left, top), text="\uf077", font=BaseState.font_awesome_small, fill="yellow")
         top += hu + gap + ht + gap          
         draw.text((left, top), text="\uf078", font=BaseState.font_awesome_small, fill="yellow")           
-
-

@@ -2,6 +2,7 @@ from luma.core.interface.serial import i2c
 from luma.core.render import canvas
 from luma.oled.device import ssd1306
 from gpiozero import Button
+from gpiozero import MotionSensor
 from base_state import BaseState
 from time_state import TimeState
 from set_time_state import SetTimeState
@@ -17,11 +18,12 @@ LEFT_BUTTON = Button(6)
 RIGHT_BUTTON = Button(0)
 ACTION_BUTTON = Button(5)
 HOME_BUTTON = Button(19)
+PIR = MotionSensor(14)
 
 # Work out height of text
 text_height = 0
 with canvas(display) as draw:
-        w, text_height = draw.textsize(" ")
+    w, text_height = draw.textsize(" ")
 
 # prev icon (small)
 # gap
@@ -54,6 +56,7 @@ arm_state = BaseState("arm", "\uf21b", home_state, BaseState.font_awesome, BaseS
 time_state = TimeState(home_state)
 set_time_state = SetTimeState(home_state)
 set_date_state = SetDateState(home_state)
+capture_state = CaptureState(home_state)
 usb_state = BaseState("usb", "\uf287", home_state, font_awesome_brands, font_awesome_brands_small)
 wifi_state = BaseState("wifi", "\uf1eb", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 
@@ -61,6 +64,7 @@ home_state.set_next_state(settings_state)
 home_state.set_action_state(time_state)
 settings_state.set_action_state(set_capture_mode_state)
 set_capture_mode_state.set_next_state(settings_time)
+set_capture_mode_state.set_action_state(capture_state)
 settings_time.set_next_state(settings_date)
 settings_time.set_action_state(set_time_state)
 settings_date.set_next_state(usb_state)
@@ -86,12 +90,21 @@ def action_pressed():
 def home_pressed():
     BaseState.current_state.home()
 
+def motion_detected():
+    BaseState.current_state.motion_detected()
+
+def motion_stopped():
+    BaseState.current_state.motion_stopped()
+
 UP_BUTTON.when_pressed = up_pressed
 DOWN_BUTTON.when_pressed = down_pressed
 LEFT_BUTTON.when_pressed = left_pressed
 RIGHT_BUTTON.when_pressed = right_pressed
 ACTION_BUTTON.when_pressed = action_pressed
 HOME_BUTTON.when_pressed = home_pressed
+PIR.when_motion = motion_detected
+PIR when_no_motion = motion_stopped
+BaseState.pir = PIR
 
 while BaseState.current_state.is_running():
     if BaseState.current_state.should_update():

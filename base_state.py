@@ -1,4 +1,11 @@
 from luma.core.render import canvas
+import logging
+
+logdir = '/home/pi/trailcam_log'
+logfile = logdir + '/trailcam_log-'+str(datetime.now().strftime('%Y%m%d-%H%M'))+'.csv'
+logging.basicConfig(filename=logfile, level=logging.DEBUG,
+    format='%(asctime)s %(message)s',
+    datefmt='%Y-%m-%d, %H:%M:%S,')
 
 class BaseState:
     def __init__(self, state_name, state_icon, home_state, font, font_small):
@@ -17,6 +24,8 @@ class BaseState:
             BaseState.home_state = home_state
         self.action_state = None
         self.parent_state = None
+        self.motion_was_detected = False
+
 
     def set_next_state(self, next_state):
         self.next_state = next_state
@@ -107,6 +116,25 @@ class BaseState:
     def handleAnyInput(self):
         return
 
+    def motion_detected(self):
+        self.motion_was_detected = True
+
+    def motion_stopped(self):
+        self.motion_was_detected = False
+
+    def log_info(self, message):
+        logging.info(message)
+
+    def centre_text(self, draw, width, height, text):
+        w, h = draw.textsize(text=text)
+        left = (width - w) / 2
+        top = (height -h) / 2
+        draw.text((left, top), text=text, fill="yelloe")
+
+    def show_motion_dot(self, draw, width, height):
+        if motion_was_detected:
+            draw.ellipse((width,0,width-8,8), fill="yellow")
+
     def show_state(self, draw, width, height):
         self.update_required = False
         gap = 3
@@ -137,6 +165,7 @@ class BaseState:
         left = (width - wn) / 2
         top += gap + hs
         draw.text((left, top), text=next_icon, font=next_font, fill="yellow")
+        self.show_motion_dot(draw, wicth, height)
 
     def show(self, display):
         with canvas(display) as draw:
