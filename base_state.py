@@ -1,10 +1,12 @@
 from luma.core.render import canvas
 
 class BaseState:
-    def __init__(self, state_name, state_icon, home_state):
+    def __init__(self, state_name, state_icon, home_state, font, font_small):
         self.update_required = True
         self.state_name = state_name
         self.state_icon = state_icon
+        self.font = font
+        self.font_small = font_small
         self.next_state = None
         self.prev_state = None
         if home_state == None:
@@ -54,11 +56,23 @@ class BaseState:
         else:
             return " "
 
+    def next_font(self):
+        if self.next_state != None:
+            return self.next_state.font_small
+        else:
+            return BaseState.font_awesome_small
+
     def prev_icon(self):
         if self.prev_state != None:
             return self.prev_state.icon()
         else:
             return " "
+
+    def prev_font(self):
+        if self.prev_state != None:
+            return self.prev_state.font_small
+        else:
+            return BaseState.font_awesome_small
 
     def up(self):
         if self.prev() != None:
@@ -100,17 +114,19 @@ class BaseState:
         state = self.name()
         prev_icon = self.prev_icon()
         next_icon = self.next_icon()
-        wp, hp = draw.textsize(text=prev_icon, font=BaseState.font_awesome_small)
-        wi, hi = draw.textsize(text=icon, font=BaseState.font_awesome)
+        prev_font = self.prev_font()
+        next_font = self.next_font()
+        wp, hp = draw.textsize(text=prev_icon, font=prev_font)
+        wi, hi = draw.textsize(text=icon, font=self.font)
         wa, ha = draw.textsize(text="\uf105", font=BaseState.font_awesome)
         ws, hs = draw.textsize(text=state)
-        wn, hn = draw.textsize(text=next_icon, font=BaseState.font_awesome_small)
+        wn, hn = draw.textsize(text=next_icon, font=next_font)
         left = (width - wp) / 2
         top = 0
-        draw.text((left, top), text=prev_icon, font=BaseState.font_awesome_small, fill="yellow")
+        draw.text((left, top), text=prev_icon, font=prev_font, fill="yellow")
         left = (width - wi) / 2
         top += hp + gap
-        draw.text((left, top), text=icon, font=BaseState.font_awesome, fill="yellow")
+        draw.text((left, top), text=icon, font=self.font, fill="yellow")
         if self.action_state != None:
             draw.text((width - wa, top), text="\uf105", font=BaseState.font_awesome, fill="yellow")
         if self.parent_state != None:
@@ -120,7 +136,7 @@ class BaseState:
         draw.text((left, top), text=state, fill="yellow")
         left = (width - wn) / 2
         top += gap + hs
-        draw.text((left, top), text=next_icon, font=BaseState.font_awesome_small, fill="yellow")
+        draw.text((left, top), text=next_icon, font=next_font, fill="yellow")
 
     def show(self, display):
         with canvas(display) as draw:
