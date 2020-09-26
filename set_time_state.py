@@ -15,7 +15,7 @@ class SetTimeState(SetDateTimeBaseState):
     def activate(self):
         now = datetime.now()
         self._mode = 0
-        self.time = [now.strftime("%H"), now.strftime("%M"), now.strftime("%S")]
+        self.time = [int(now.strftime("%H")), int(now.strftime("%M")), int(now.strftime("%S"))]
         self.set_edit_mode(0)
         super()
 

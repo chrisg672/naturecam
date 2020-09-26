@@ -49,8 +49,12 @@ font_awesome_brands = make_font("fa-brands-400.ttf", large_icon_size)
 font_awesome_brands_small = make_font("fa-brands-400.ttf", small_icon_size)
 
 home_state = BaseState("home", "\uf015", None, BaseState.font_awesome, BaseState.font_awesome_small)
-settings_state = BaseState("settings", "\uf013", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 start_capture_state = BaseState("start capture", "\uf030", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
+settings_state = BaseState("settings", "\uf013", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
+
+home_state.set_next_state(start_capture_state)
+start_capture_state.set_next_state(settings_state)
+
 settings_time = BaseState("set time", "\uf017", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 settings_date = BaseState("set date", "\uf073", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 arm_state = BaseState("arm", "\uf21b", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
@@ -66,8 +70,6 @@ settings_time.set_action_state(set_time_state)
 settings_date.set_action_state(set_date_state)
 start_capture_state.set_action_state(capture_state)
 
-home_state.set_next_state(start_capture_state)
-capture_state.set_next_state(settings_state)
 settings_state.set_action_state(settings_time)
 settings_time.set_next_state(settings_date)
 settings_date.set_next_state(settings_usb)

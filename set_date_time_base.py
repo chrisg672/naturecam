@@ -14,8 +14,11 @@ class SetDateTimeBaseState(BaseState):
         self.normalise()
     
     def down(self):
-        self.time[self._mode] += 1
+        self.time[self._mode] -= 1
         self.normalise()
+
+    def isValid(self):
+        return True
 
     def normalise(self):
         for i in range(0,2):
@@ -41,7 +44,7 @@ class SetDateTimeBaseState(BaseState):
            self.set_edit_mode(self._mode + 1)  
 
     def show_state(self, draw, width, height):
-        now = self.time[0]+self.sep+self.time[1]+self.sep+self.time[2]
+        now = str(self.time[0]).zfill(2)+self.sep+str(self.time[1]).zfill(2)+self.sep+str(self.time[2]).zfill(2)
 
         gap = 6
         wu,hu = draw.textsize(text="\uf077", font=BaseState.font_awesome_small)

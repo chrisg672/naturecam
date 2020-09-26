@@ -33,13 +33,14 @@ class CaptureState(BaseState):
         self.start_settling(10) # should be 60
         super().activate()
 
-    # def down(self):
-    #     self.motion_stopped()
+    def down(self):
+        self.motion_stopped()
 
-    # def up(self):
-    #     self.motion_detected()
+    def up(self):
+        self.motion_detected()
 
     def motion_detected(self):
+        self.log_info("motion detected")
         if not self.capturing_video and not self.settling:
             self.start_capture_video()
         super().motion_detected()
@@ -61,7 +62,7 @@ class CaptureState(BaseState):
                 self.cam.wait_recording(0.2)
 
     def end_capture_video(self):
-        # Do we need to close() the camera?
+        self.cam.close()
         self.cam = None
         self.capturing_video = True
         timestamp = datetime.now().strftime('%d-%m-%y_%H-%M-%S')
