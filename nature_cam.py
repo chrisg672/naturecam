@@ -19,7 +19,7 @@ LEFT_BUTTON = Button(6)
 RIGHT_BUTTON = Button(0)
 ACTION_BUTTON = Button(5)
 HOME_BUTTON = Button(19)
-PIR = MotionSensor(14)
+PIR = MotionSensor(21)
 
 # Work out height of text
 text_height = 0
