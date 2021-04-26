@@ -3,7 +3,7 @@ import psutil
 from base_state import BaseState
 from luma.core.render import canvas
 
-class TimeState(BaseState):
+class ShowTimeIpState(BaseState):
     def __init__(self, home_state):
         self.date_now = ""
         self.time_now = ""
