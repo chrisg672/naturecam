@@ -5,7 +5,7 @@ from gpiozero import Button
 from gpiozero import MotionSensor
 from gpiozero import DigitalOutputDevice
 from base_state import BaseState
-from time_state import TimeState
+from show_time_ip_state import ShowTimeIpState
 from set_time_state import SetTimeState
 from set_date_state import SetDateState
 from capture_state import CaptureState
@@ -57,37 +57,46 @@ font_awesome_brands_small = make_font("fa-brands-400.ttf", small_icon_size)
 BaseState.camera_mode = 2 # AUTO
 BaseState.CAMERA_CONTROL = CAMERA_CONTROL
 
+# HOME 
 home_state = BaseState("home", "\uf015", None, BaseState.font_awesome, BaseState.font_awesome_small)
-start_capture_state = BaseState("start capture", "\uf030", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
-settings_state = BaseState("settings", "\uf013", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
+#     HOME -> SHOW-TIME-IP
+show_time_ip_state = ShowTimeIpState(home_state)
+home_state.set_action_state(show_time_ip_state)
 
+# HOME (down) START-CAPTURE
+start_capture_state = BaseState("start capture", "\uf030", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 home_state.set_next_state(start_capture_state)
+#    START-CAPTURE -> SET-CAMERA-MODE
+set_camera_mode_state = SetCameraModeState(home_state)
+start_capture_state.set_action_state(set_camera_mode_state)
+#       SET-CAMERA-MODE -> CAPTURING
+capture_state = CaptureState(home_state)
+set_camera_mode_state.set_action_state(capture_state)
+
+
+# START-CAPTURE (down) SETTINGS
+settings_state = BaseState("settings", "\uf013", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 start_capture_state.set_next_state(settings_state)
 
-# Settings sub-menu
+#    SETTINGS -> SET-TIME
 settings_time = BaseState("set time", "\uf017", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
-settings_date = BaseState("set date", "\uf073", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
-settings_mode = BaseState("set camera mode", "\uf3ed", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
-arm_state = BaseState("arm", "\uf21b", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
-
-time_state = TimeState(home_state)
+settings_state.set_action_state(settings_time)
+#       SET-TIME -> ACTUALLY SET TIME
 set_time_state = SetTimeState(home_state)
-set_date_state = SetDateState(home_state)
-capture_state = CaptureState(home_state)
-set_camera_mode_state = SetCameraModeState(home_state)
-settings_wifi = BaseState("pair wifi", "\uf1eb", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
-add_wifi_network = AddWiFiNetwork(home_state)
-
-home_state.set_action_state(time_state)
 settings_time.set_action_state(set_time_state)
-settings_date.set_action_state(set_date_state)
-settings_mode.set_action_state(set_camera_mode_state)
-start_capture_state.set_action_state(capture_state)
 
-settings_state.set_action_state(settings_mode)
-settings_mode.set_next_state(settings_time)
+#    SET-TIME (down) SET-DATE
+settings_date = BaseState("set date", "\uf073", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 settings_time.set_next_state(settings_date)
+#       SET-DATE -> ACTUALLY SET DATE
+set_date_state = SetDateState(home_state)
+settings_date.set_action_state(set_date_state)
+
+#    SET-DATE (down) SET-WIFI
+settings_wifi = BaseState("pair wifi", "\uf1eb", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 settings_date.set_next_state(settings_wifi)
+#       SET-WIFI -> ADD-WIFI
+add_wifi_network = AddWiFiNetwork(home_state)
 settings_wifi.set_action_state(add_wifi_network)
 
 def up_pressed():
