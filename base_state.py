@@ -126,10 +126,9 @@ class BaseState:
     def log_info(self, message):
         logging.info(message)
 
-    def centre_text(self, draw, width, height, text):
+    def centre_text(self, draw, width, top, text):
         w, h = draw.textsize(text=text)
         left = (width - w) / 2
-        top = (height -h) / 2
         draw.text((left, top), text=text, fill="yellow")
 
     def show_motion_dot(self, draw, width, height):

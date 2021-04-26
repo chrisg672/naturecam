@@ -3,11 +3,14 @@ from luma.core.render import canvas
 from luma.oled.device import ssd1306
 from gpiozero import Button
 from gpiozero import MotionSensor
+from gpiozero import DigitalOutputDevice
 from base_state import BaseState
 from time_state import TimeState
 from set_time_state import SetTimeState
 from set_date_state import SetDateState
 from capture_state import CaptureState
+from add_wifi_network import AddWiFiNetwork
+from set_camera_mode_state import SetCameraModeState
 import os
 from PIL import ImageFont
 
@@ -19,7 +22,9 @@ LEFT_BUTTON = Button(6)
 RIGHT_BUTTON = Button(0)
 ACTION_BUTTON = Button(5)
 HOME_BUTTON = Button(19)
-PIR = MotionSensor(21)
+PIR = MotionSensor(23)
+# Camera Mode High => Day Mode, Low => Night Mode
+CAMERA_CONTROL = DigitalOutputDevice(21, True, True)
 
 # Work out height of text
 text_height = 0
@@ -48,6 +53,10 @@ BaseState.font_awesome_small = make_font("fa-solid-900.ttf", small_icon_size)
 font_awesome_brands = make_font("fa-brands-400.ttf", large_icon_size)
 font_awesome_brands_small = make_font("fa-brands-400.ttf", small_icon_size)
 
+# 0 = Day, 1 = Night, 2 = Auto
+BaseState.camera_mode = 2 # AUTO
+BaseState.CAMERA_CONTROL = CAMERA_CONTROL
+
 home_state = BaseState("home", "\uf015", None, BaseState.font_awesome, BaseState.font_awesome_small)
 start_capture_state = BaseState("start capture", "\uf030", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 settings_state = BaseState("settings", "\uf013", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
@@ -55,27 +64,31 @@ settings_state = BaseState("settings", "\uf013", home_state, BaseState.font_awes
 home_state.set_next_state(start_capture_state)
 start_capture_state.set_next_state(settings_state)
 
+# Settings sub-menu
 settings_time = BaseState("set time", "\uf017", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 settings_date = BaseState("set date", "\uf073", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
+settings_mode = BaseState("set camera mode", "\uf3ed", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 arm_state = BaseState("arm", "\uf21b", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
+
 time_state = TimeState(home_state)
 set_time_state = SetTimeState(home_state)
 set_date_state = SetDateState(home_state)
 capture_state = CaptureState(home_state)
-settings_usb = BaseState("usb", "\uf287", home_state, font_awesome_brands, font_awesome_brands_small)
-settings_wifi = BaseState("wifi", "\uf1eb", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
+set_camera_mode_state = SetCameraModeState(home_state)
+settings_wifi = BaseState("pair wifi", "\uf1eb", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
+add_wifi_network = AddWiFiNetwork(home_state)
 
 home_state.set_action_state(time_state)
 settings_time.set_action_state(set_time_state)
 settings_date.set_action_state(set_date_state)
+settings_mode.set_action_state(set_camera_mode_state)
 start_capture_state.set_action_state(capture_state)
 
-settings_state.set_action_state(settings_time)
+settings_state.set_action_state(settings_mode)
+settings_mode.set_next_state(settings_time)
 settings_time.set_next_state(settings_date)
-settings_date.set_next_state(settings_usb)
-settings_usb.set_next_state(settings_wifi)
-
-
+settings_date.set_next_state(settings_wifi)
+settings_wifi.set_action_state(add_wifi_network)
 
 def up_pressed():
     BaseState.current_state.up()
