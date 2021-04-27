@@ -11,16 +11,16 @@ class SetDateTimeBaseState(BaseState):
 
     def up(self):
         self.time[self._mode] += 1
-        self.normalise()
+        self.normalise(+1)
     
     def down(self):
         self.time[self._mode] -= 1
-        self.normalise()
+        self.normalise(-1)
 
     def isValid(self):
         return True
 
-    def normalise(self):
+    def normalise(self, direction):
         for i in range(0,2):
             if self.time[i] < self.min[i]:
                 self.time[i] = self.max[i]
@@ -28,7 +28,7 @@ class SetDateTimeBaseState(BaseState):
                 self.time[i] = self.min[i]
 
     def set_date_time(self):
-        print ("sudo date %T -s " +self.time[0]+self.sep+self.time[1]+self.sep+self.time[2])
+        raise "error need to define set_date_time method"
 
     def action(self):
         self.set_date_time()
