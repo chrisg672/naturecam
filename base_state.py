@@ -1,5 +1,9 @@
 from luma.core.render import canvas
 import logging
+import os.path
+import json
+
+settings_file = "/home/pi/.nature_cam_settings.json"
 
 class BaseState:
     def __init__(self, state_name, state_icon, home_state, font, font_small):
@@ -166,3 +170,18 @@ class BaseState:
 
     def is_running(self):
         return True
+
+    def load_settings(self):
+        if os.path.isfile(settings_file):
+            with open(settings_file) as json_file:
+                data = json.load(json_file)
+                BaseState.capture_duration = data['capture_duration']
+                BaseState.camera_mode = data['camera_mode']
+    
+    def save_settings(self):
+        data = {}
+        data['capture_duration'] = BaseState.capture_duration
+        data['camera_mode'] = BaseState.camera_mode
+        with open(settings_file, 'w') as outfile:
+            json.dump(data, outfile)
+

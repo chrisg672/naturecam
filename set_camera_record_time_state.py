@@ -14,6 +14,10 @@ class SetCameraRecordTimeState(BaseState):
         if BaseState.capture_duration < 10:
             BaseState.capture_duration = 99;
 
+    def action(self):
+        self.save_settings()
+        super().action()
+
     def show_state(self, draw, width, height):
         # Record Time
         #    nnnn s

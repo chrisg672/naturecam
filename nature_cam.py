@@ -68,6 +68,7 @@ BaseState.capture_duration = 20 # 20s capture times
 
 # HOME 
 home_state = BaseState("home", "\uf015", None, BaseState.font_awesome, BaseState.font_awesome_small)
+home_state.load_settings() # loads current settings into BaseState
 #     HOME -> SHOW-TIME-IP
 show_time_ip_state = ShowTimeIpState(home_state)
 home_state.set_action_state(show_time_ip_state)
