@@ -16,6 +16,10 @@ class SetCameraModeState(BaseState):
             BaseState.camera_mode += 1
         else:
             BaseState.camera_mode = 0 # wrap around
+    
+    def action(self):
+        self.save_settings()
+        super().action()
 
     def show_state(self, draw, width, height):
         icon = "\uf185" # Sun
