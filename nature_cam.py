@@ -11,8 +11,17 @@ from set_date_state import SetDateState
 from capture_state import CaptureState
 from add_wifi_network import AddWiFiNetwork
 from set_camera_mode_state import SetCameraModeState
+from set_camera_record_time_state import SetCameraRecordTimeState
 import os
 from PIL import ImageFont
+import logging
+from datetime import datetime
+
+logdir = '/home/pi/trailcam_log'
+logfile = logdir + '/trailcam_log-'+str(datetime.now().strftime('%Y%m%d-%H%M'))+'.csv'
+logging.basicConfig(filename=logfile, level=logging.DEBUG,
+    format='%(asctime)s %(message)s',
+    datefmt='%Y-%m-%d, %H:%M:%S,')
 
 serial = i2c(port=1, address=0x3C)
 display = ssd1306(serial)
@@ -50,12 +59,12 @@ def make_font(name, size):
 
 BaseState.font_awesome = make_font("fa-solid-900.ttf", large_icon_size)
 BaseState.font_awesome_small = make_font("fa-solid-900.ttf", small_icon_size)
-font_awesome_brands = make_font("fa-brands-400.ttf", large_icon_size)
-font_awesome_brands_small = make_font("fa-brands-400.ttf", small_icon_size)
 
 # 0 = Day, 1 = Night, 2 = Auto
 BaseState.camera_mode = 2 # AUTO
 BaseState.CAMERA_CONTROL = CAMERA_CONTROL
+
+BaseState.capture_duration = 20 # 20s capture times
 
 # HOME 
 home_state = BaseState("home", "\uf015", None, BaseState.font_awesome, BaseState.font_awesome_small)
@@ -66,22 +75,24 @@ home_state.set_action_state(show_time_ip_state)
 # HOME (down) START-CAPTURE
 start_capture_state = BaseState("start capture", "\uf030", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 home_state.set_next_state(start_capture_state)
-#    START-CAPTURE -> SET-CAMERA-MODE
+# START-CAPTURE -> SET-CAMERA-MODE
 set_camera_mode_state = SetCameraModeState(home_state)
 start_capture_state.set_action_state(set_camera_mode_state)
-#       SET-CAMERA-MODE -> CAPTURING
+#    SET-CAMERA-MODE -> SET-CAPTURE-TIME
+set_camera_record_time_state = SetCameraRecordTimeState(home_state)
+set_camera_mode_state.set_action_state(set_camera_record_time_state)
+#       SET-CAPTURE-TIME -> CAPTURING
 capture_state = CaptureState(home_state)
-set_camera_mode_state.set_action_state(capture_state)
-
+set_camera_record_time_state.set_action_state(capture_state)
 
 # START-CAPTURE (down) SETTINGS
 settings_state = BaseState("settings", "\uf013", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 start_capture_state.set_next_state(settings_state)
 
-#    SETTINGS -> SET-TIME
+# SETTINGS -> SET-TIME
 settings_time = BaseState("set time", "\uf017", home_state, BaseState.font_awesome, BaseState.font_awesome_small)
 settings_state.set_action_state(settings_time)
-#       SET-TIME -> ACTUALLY SET TIME
+#    SET-TIME -> ACTUALLY SET TIME
 set_time_state = SetTimeState(home_state)
 settings_time.set_action_state(set_time_state)
 
@@ -101,9 +112,11 @@ settings_wifi.set_action_state(add_wifi_network)
 
 def up_pressed():
     BaseState.current_state.up()
+    logging.info("up -> state = "+ BaseState.current_state.name())
 
 def down_pressed():
     BaseState.current_state.down()
+    logging.info("down -> state = "+ BaseState.current_state.name())
 
 def left_pressed():
     BaseState.current_state.left()

@@ -58,7 +58,7 @@ class CaptureState(BaseState):
         self._cam.resolution = (1920,1024)
         self._cam.annotate_background = picamera.Color('black')
         self._cam.start_recording('/home/pi/video.h264')
-        self.capture_end_at = time.mktime(datetime.now().utctimetuple()) + 20
+        self.capture_end_at = time.mktime(datetime.now().utctimetuple()) + BaseState.capture_duration
         self._capturing_video = True
 
     def update_video(self):

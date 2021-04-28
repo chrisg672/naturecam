@@ -4,7 +4,7 @@ import os
 
 class SetDateState(SetDateTimeBaseState):
     def __init__(self, home_state):
-        super().__init__("aet date", home_state)
+        super().__init__("set date", home_state)
         self.min[0] = 1
         self.max[0] = 31
         self.min[1] = 1
