@@ -1,5 +1,6 @@
 from datetime import datetime
 from set_date_time_base import SetDateTimeBaseState
+import os
 
 class SetTimeState(SetDateTimeBaseState):
     def __init__(self, home_state):
@@ -20,4 +21,7 @@ class SetTimeState(SetDateTimeBaseState):
         super()
 
     def set_date_time(self):
-        print ("sudo date %T -s " +self.time[0]+self.sep+self.time[1]+self.sep+self.time[2])
+        err = os.system("sudo date +%T -s " +str(self.time[0]).zfill(2)+self.sep+str(self.time[1]).zfill(2)+self.sep+str(self.time[2]).zfill(2))
+        if err == 0:
+            p = os.path.dirname(os.path.abspath(__file__))
+            os.system("sudo "+p+"/writeTimeToRTC.sh")

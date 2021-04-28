@@ -1,12 +1,5 @@
 from luma.core.render import canvas
-from datetime import datetime
 import logging
-
-logdir = '/home/pi/trailcam_log'
-logfile = logdir + '/trailcam_log-'+str(datetime.now().strftime('%Y%m%d-%H%M'))+'.csv'
-logging.basicConfig(filename=logfile, level=logging.DEBUG,
-    format='%(asctime)s %(message)s',
-    datefmt='%Y-%m-%d, %H:%M:%S,')
 
 class BaseState:
     def __init__(self, state_name, state_icon, home_state, font, font_small):
