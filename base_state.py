@@ -181,7 +181,7 @@ class BaseState:
     def save_settings(self):
         data = {}
         data['capture_duration'] = BaseState.capture_duration
-        data['camera_mode'] = BaseSate.camera_mode
+        data['camera_mode'] = BaseState.camera_mode
         with open(settings_file, 'w') as outfile:
             json.dump(data, outfile)
 
